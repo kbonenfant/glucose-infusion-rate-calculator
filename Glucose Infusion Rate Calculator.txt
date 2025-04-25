@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Glucose Infusion Rate Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    table {
+      border-collapse: collapse;
+      width: 450px;
+      background: #ffffff;
+    }
+    td {
+      padding: 8px;
+      border: 1px solid #ccc;
+    }
+    .green {
+      background-color: #90ee90;
+    }
+    .yellow {
+      background-color: #ffff99;
+    }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    input[readonly] {
+      background-color: #ffff99;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Glucose Infusion Rate Calculator</h2>
+  <table>
+    <tr>
+      <td class="green">Fluid Rate (L/hr)</td>
+      <td class="green"><input id="fluidRate" type="number" step="0.01" value="0.2"></td>
+    </tr>
+    <tr>
+      <td class="green">Dose Rate (mg/kg/min)</td>
+      <td class="green"><input id="doseRate" type="number" step="0.1" value="4"></td>
+    </tr>
+    <tr>
+      <td class="green">Body Weight (kg)</td>
+      <td class="green"><input id="weight" type="number" step="0.1" value="50"></td>
+    </tr>
+    <tr>
+      <td class="yellow">Desired Solution (%)</td>
+      <td class="yellow"><input id="desiredPercent" type="text" readonly></td>
+    </tr>
+    <tr>
+      <td class="green">Fluid Volume (L)</td>
+      <td class="green"><input id="fluidVolume" type="number" step="0.1" value="1"></td>
+    </tr>
+    <tr>
+      <td class="green">Stock Concentration (%)</td>
+      <td class="green"><input id="stockPercent" type="number" step="0.1" value="5"></td>
+    </tr>
+    <tr>
+      <td class="yellow">Dose to Add (mL)</td>
+      <td class="yellow"><input id="doseToAdd" type="text" readonly></td>
+    </tr>
+  </table>
+
+  <br>
+  <button onclick="calculate()">Calculate</button>
+
+  <script>
+    function calculate() {
+      const fluidRate = parseFloat(document.getElementById("fluidRate").value); // L/hr
+      const doseRate = parseFloat(document.getElementById("doseRate").value);   // mg/kg/min
+      const weight = parseFloat(document.getElementById("weight").value);       // kg
+      const fluidVolume = parseFloat(document.getElementById("fluidVolume").value); // L
+      const stockPercent = parseFloat(document.getElementById("stockPercent").value); // %
+
+      if ([fluidRate, doseRate, weight, fluidVolume, stockPercent].some(v => isNaN(v) || v <= 0)) {
+        document.getElementById("desiredPercent").value = "Invalid input";
+        document.getElementById("doseToAdd").value = "Invalid input";
+        return;
+      }
+
+      const fluidRate_mL_min = fluidRate * 1000 / 60;
+
+      const requiredConcentration_mg_mL = (doseRate * weight) / fluidRate_mL_min;
+      const desiredPercent = requiredConcentration_mg_mL / 10;
+
+      const stock_mg_mL = stockPercent * 10;
+      const doseToAdd_mL = (requiredConcentration_mg_mL * fluidVolume * 1000) / stock_mg_mL;
+
+      document.getElementById("desiredPercent").value = desiredPercent.toFixed(2);
+      document.getElementById("doseToAdd").value = doseToAdd_mL.toFixed(2);
+    }
+  </script>
+
+</body>
+</html>
